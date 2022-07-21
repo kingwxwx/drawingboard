@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画板</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <canvas id="canvas" width="100" height="100"></canvas>
+    <script>
+        var canvas = document.getElementById("canvas");
+        canvas.width = document.documentElement.clientWidth
+        canvas.height = document.documentElement.clientHeight//让canvas的宽高与屏幕一致
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "black"
+        ctx.strokestyle = 'none'
+        ctx.lineWidth = 3
+        ctx.lineCap = "round"//让线拐角处成弧状
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }//定义一个划线函数，从点1（x1,y1）到（x2,y2）
+        let painting = false
+
+        var isTouchDevice = 'ontouchstart' in
+            document.documentElement;
+        if (isTouchDevice) {
+            canvas.ontouchstart = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                last = [x, y]
+            }//手指触摸屏幕时，获得初始触摸点坐标（x,y），并存入last数组，作为初始值
+
+            canvas.ontouchmove = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                drawLine(last[0], last[1], x, y)
+                last = [x, y]
+
+            }//当手指移动时，从旧坐标向新坐标划线，并将新坐标的值赋予last数组
+        } else {
+            canvas.onmousedown = (e) => {
+                painting = true
+                last = [e.clientX, e.clientY]
+            }//鼠标按下时打开painting，获得初始点击处坐标，并存入last数组，作为初始值
+            canvas.onmousemove = (e) => {
+                if (painting === true) {
+                    drawLine(last[0], last[1], e.clientX, e.clientY)
+                    last = [e.clientX, e.clientY]
+                } //当鼠标移动时，判定painting是否打开，若为开则从旧坐标向新坐标划线，并将新坐标的值赋予last数组
+            }
+            canvas.onmouseup = () => {
+                painting = false
+            }//当鼠标松开时，关掉painting
+        }//电脑端比手机多一个判定鼠标是否按下的步骤
+
+
+    </script>
+</body>
+
+</html>
